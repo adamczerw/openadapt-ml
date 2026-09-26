@@ -24,7 +24,7 @@ from openadapt_ml.ingest.capture import capture_to_episode
 
 episode = capture_to_episode(
     "/path/to/capture",
-    goal="Turn off Night Shift"
+    instruction="Turn off Night Shift"
 )
 ```
 

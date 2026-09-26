@@ -804,7 +804,7 @@ def main():
 
     # Convert capture to episode
     print(f"Loading capture from: {capture_path}")
-    episode = capture_to_episode(capture_path, goal=args.goal)
+    episode = capture_to_episode(capture_path, instruction=args.goal)
     print(f"Loaded {len(episode.steps)} steps")
 
     # Load model if checkpoint provided

@@ -79,6 +79,59 @@ def get_current_job_directory(base_dir: str | Path) -> Path | None:
     return None
 
 
+def update_current_symlink_to_latest(
+    base_dir: str | Path = "training_output",
+) -> Path | None:
+    """Point base_dir/current to the most recently updated training run.
+
+    Args:
+        base_dir: Base output directory that contains per-run subdirectories.
+
+    Returns:
+        The selected latest run directory, or None when no run directories exist.
+    """
+    base_dir = Path(base_dir)
+    current_link = base_dir / "current"
+
+    if not base_dir.exists() or not base_dir.is_dir():
+        return None
+
+    # Prefer directories with training logs; fall back to directory mtime.
+    candidates: list[Path] = []
+    for path in base_dir.iterdir():
+        if not path.is_dir():
+            continue
+        if path.name == "current" or path.name.startswith("."):
+            continue
+        candidates.append(path)
+
+    if not candidates:
+        return None
+
+    def _latest_key(path: Path) -> float:
+        log_file = path / "training_log.json"
+        if log_file.exists():
+            return log_file.stat().st_mtime
+        return path.stat().st_mtime
+
+    latest = max(candidates, key=_latest_key)
+
+    # Atomically repoint current symlink to the chosen directory.
+    temp_link = base_dir / f".current_temp_{latest.name}_{int(time.time() * 1000)}"
+    try:
+        if temp_link.exists() or temp_link.is_symlink():
+            temp_link.unlink()
+
+        temp_link.symlink_to(latest.name)
+        temp_link.replace(current_link)
+    except OSError as e:
+        if temp_link.exists() or temp_link.is_symlink():
+            temp_link.unlink()
+        raise RuntimeError(f"Failed to update current symlink: {e}") from e
+
+    return latest
+
+
 @dataclass
 class TrainingConfig:
     # Model / LoRA-related fields are handled elsewhere; this covers loop hyperparams.

@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## Unreleased
+
+### Bug Fixes
+
+- Add update_current_symlink_to_latest used by `serve`
+  ([`a3d130c`](https://github.com/adamczerw/openadapt-ml/commit/a3d130c28a34fe2f9183f01d3440f11d730d6cff))
+
+`serve` imported this function to repair the `training_output/current` link, but it did not exist.
+
+- Use generate_synthetic_episodes in demo_policy
+  ([`42a0270`](https://github.com/adamczerw/openadapt-ml/commit/42a0270fd7edabbb42093353cb2e4a3b50a8b258))
+
+- Pass instruction= to capture_to_episode
+  ([`7c5c72a`](https://github.com/adamczerw/openadapt-ml/commit/7c5c72a08ede2cb06357516c9bf2b4cc9572408f))
+
+Fixes a TypeError when loading a capture in train.py, compare.py and the demo-prompt experiment.
+
+
 ## v0.15.1 (2026-03-21)
 
 ### Bug Fixes
